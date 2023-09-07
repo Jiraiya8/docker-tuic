@@ -1,0 +1,12 @@
+version: '3.9'
+services:
+  tuic-server:
+    image: liyuanbiao/tuic-server:latest
+    container_name: tuic-server
+    restart: unless-stopped
+    volumes:
+      - /root/cert/:/root/cert/
+      - ./config.json:/etc/tuic-server/config.json
+    network_mode: host
+    command: -c /etc/tuic-server/config.json
+
