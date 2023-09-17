@@ -1,0 +1,16 @@
+FROM liyuanbiao/tuic:latest AS builder
+FROM alpine:latest AS dist
+
+COPY --from=builder /usr/local/bin/tuic-server /usr/local/bin/
+
+RUN set -ex \
+    && chmod +x /usr/local/bin/tuic-server \
+    && apk update \
+    && apk add tzdata ca-certificates \
+    && rm -rf /var/cache/apk/*
+
+VOLUME [ "/etc/tuic/" ]
+
+ENTRYPOINT [ "/usr/local/bin/tuic-server" ]
+
+CMD [ "-c", "/etc/tuic/server.json" ]

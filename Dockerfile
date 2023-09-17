@@ -10,7 +10,7 @@ RUN set -ex \
   && wget https://github.com/EAimTY/tuic/archive/refs/tags/tuic-server-${TUIC_VERSION}.tar.gz -O tuic-server-${TUIC_VERSION}.tar.gz \
   && tar -zxvf tuic-server-${TUIC_VERSION}.tar.gz
 
-WORKDIR /tuic-tuic-server-${TUIC_VERSION}/tuic-server
+WORKDIR /tuic-tuic-server-${TUIC_VERSION}/
 
 RUN cargo build --release
 
@@ -19,9 +19,11 @@ FROM alpine:latest AS dist
 ARG TUIC_VERSION
 
 COPY --from=builder /tuic-tuic-server-${TUIC_VERSION}/target/release/tuic-server /usr/local/bin/
+COPY --from=builder /tuic-tuic-server-${TUIC_VERSION}/target/release/tuic-client /usr/local/bin/
 
 RUN set -ex \
     && chmod +x /usr/local/bin/tuic-server \
+    && chmod +x /usr/local/bin/tuic-client \
     && apk update \
     && apk upgrade \
     && apk add tzdata ca-certificates \
@@ -29,6 +31,4 @@ RUN set -ex \
 
 VOLUME [ "/etc/tuic/" ]
 
-ENTRYPOINT ["/usr/local/bin/tuic-server"]
-
-CMD ["--help"]
+CMD [ "tuic-server", "-c", "/etc/tuic/server.json" ]
